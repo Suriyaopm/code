@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">MCQ Generator</h1>
+        <form id="mcqForm" class="mt-4">
+            <div class="mb-3">
+                <label for="topic" class="form-label">Enter Topic:</label>
+                <input type="text" class="form-control" id="topic" name="topic" required>
+            </div>
+            <div class="mb-3">
+                <label for="num_questions" class="form-label">Number of Questions:</label>
+                <input type="number" class="form-control" id="num_questions" name="num_questions" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Questions</button>
+        </form>
+        <div id="questions" class="mt-4">
+            <h3>Generated Questions:</h3>
+            <ul id="questionList" class="list-group"></ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#mcqForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const topic = $('#topic').val();
+                const num_questions = $('#num_questions').val();
+
+                $.ajax({
+                    url: '/generate',
+                    type: 'POST',
+                    data: { topic: topic, num_questions: num_questions },
+                    success: function(response) {
+                        if (response.error) {
+                            alert(response.error);
+                            return;
+                        }
+
+                        const questionList = $('#questionList');
+                        questionList.empty();
+
+                        response.questions.forEach(function(question) {
+                            questionList.append(`<li class="list-group-item">${question}</li>`);
+                        });
+                    },
+                    error: function() {
+                        alert('An error occurred while generating questions.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
